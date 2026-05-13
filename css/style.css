@@ -402,3 +402,38 @@ body.login-page {
         align-items: flex-start;
     }
 }
+.tasks-page {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.tasks-column {
+    flex: 1;
+    min-width: 420px;
+}
+
+.section-card {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.section-card h2 {
+    margin-bottom: 20px;
+}
+
+.task-content {
+    flex: 1;
+}
+
+.delete-btn {
+    color: #ef4444;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.completed {
+    opacity: 0.7;
+}
