@@ -1,5 +1,42 @@
 <?php
 include("includes/auth.php");
+include("includes/tarefas.php");
+
+$usuario_id = $_SESSION['id'];
+
+/* adicionar tarefa */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['titulo'])) {
+
+    $titulo = trim($_POST['titulo']);
+    $prazo = $_POST['prazo'] ?? null;
+    $urgencia = $_POST['urgencia'] ?? 'media';
+
+    if (!empty($titulo)) {
+        criarTarefa(
+            $usuario_id,
+            $titulo,
+            null,
+            null,
+            $prazo,
+            $urgencia
+        );
+    }
+
+    header("Location: home.php");
+    exit();
+}
+
+/* concluir tarefa */
+if (isset($_GET['concluir'])) {
+    concluirTarefa($_GET['concluir'], $usuario_id);
+
+    header("Location: home.php");
+    exit();
+}
+
+$tarefas = listarTarefas($usuario_id);
+$totalTarefas = contarTarefas($usuario_id);
+$totalConcluidas = contarConcluidas($usuario_id);
 ?>
 
 <!DOCTYPE html>
@@ -10,15 +47,11 @@ include("includes/auth.php");
     <title>FocusFlow - Dashboard</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link
-    rel="stylesheet"
+    <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <link rel="stylesheet" href="./css/style.css">
@@ -42,48 +75,89 @@ include("includes/auth.php");
                         <h1>Meu Dia</h1>
                         <p>Organize sua rotina e mantenha seu foco.</p>
                     </div>
-
-                    <button class="add-task-btn">
-                        <i class="fa-solid fa-plus"></i>
-                        Nova tarefa
-                    </button>
                 </div>
 
                 <div class="task-section">
                     <h3>Tarefas de Hoje</h3>
 
-                    <div class="task-card">
-                        <input type="checkbox">
-                        <div>
-                            <strong>Estudar PHP</strong>
-                            <p>Revisar autenticação e sessões.</p>
-                        </div>
-                    </div>
+                    <?php if ($tarefas->num_rows > 0): ?>
 
-                    <div class="task-card">
-                        <input type="checkbox">
-                        <div>
-                            <strong>Projeto da Faculdade</strong>
-                            <p>Montar dashboard inicial.</p>
-                        </div>
-                    </div>
+                        <?php while ($tarefa = $tarefas->fetch_assoc()): ?>
 
-                    <div class="task-card">
-                        <input type="checkbox">
-                        <div>
-                            <strong>Treino</strong>
-                            <p>Push day às 19h.</p>
-                        </div>
-                    </div>
+                                <div class="task-card">
+
+                                    <form method="GET" style="margin: 0;">
+                                        <input
+                                            type="hidden"
+                                            name="concluir"
+                                            value="<?php echo $tarefa['id']; ?>"
+                                        >
+
+                                        <input
+                                            type="checkbox"
+                                            onchange="this.form.submit()"
+                                        >
+                                    </form>
+
+                                    <div>
+                                    <strong><?php echo htmlspecialchars($tarefa['titulo']); ?></strong>
+
+                                    <div class="task-meta">
+
+                                        <?php if (!empty($tarefa['prazo'])): ?>
+                                            <span class="task-deadline">
+                                                📅 <?php echo date('d/m/Y', strtotime($tarefa['prazo'])); ?>
+                                            </span>
+                                        <?php endif; ?>
+
+                                        <span class="priority-badge priority-<?php echo $tarefa['urgencia']; ?>">
+                                            <?php
+                                                if ($tarefa['urgencia'] === 'alta') echo '🔴 Alta';
+                                                elseif ($tarefa['urgencia'] === 'media') echo '🟡 Média';
+                                                else echo '🟢 Baixa';
+                                            ?>
+                                        </span>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        <?php endwhile; ?>
+
+                    <?php else: ?>
+
+                        <p>Nenhuma tarefa cadastrada.</p>
+
+                    <?php endif; ?>
                 </div>
 
-                <div class="add-task-box">
-                    <input type="text" placeholder="Adicionar nova tarefa...">
-                    <button>
+                <form method="POST" class="task-form">
+
+                    <input
+                        type="text"
+                        name="titulo"
+                        placeholder="Título da tarefa"
+                        required
+                    >
+
+                    <input
+                        type="date"
+                        name="prazo"
+                    >
+
+                    <select name="urgencia">
+                        <option value="baixa">🟢 Baixa</option>
+                        <option value="media" selected>🟡 Média</option>
+                        <option value="alta">🔴 Alta</option>
+                    </select>
+
+                    <button type="submit">
                         <i class="fa-solid fa-plus"></i>
+                        Adicionar
                     </button>
-                </div>
 
+                </form>
             </div>
 
             <div class="dashboard-right">
@@ -99,14 +173,15 @@ include("includes/auth.php");
 
                 <div class="info-card">
                     <h4>Resumo</h4>
+
                     <div class="stats">
                         <div>
-                            <strong>12</strong>
+                            <strong><?php echo $totalTarefas; ?></strong>
                             <span>Tarefas</span>
                         </div>
 
                         <div>
-                            <strong>5</strong>
+                            <strong><?php echo $totalConcluidas; ?></strong>
                             <span>Concluídas</span>
                         </div>
                     </div>
@@ -114,6 +189,7 @@ include("includes/auth.php");
 
                 <div class="info-card">
                     <h4>Calendário</h4>
+
                     <div class="calendar-fake">
                         <span>Seg</span>
                         <span>Ter</span>
