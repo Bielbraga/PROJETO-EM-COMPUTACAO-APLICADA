@@ -4,8 +4,57 @@ include("includes/habitos.php");
 
 $usuario_id = $_SESSION['id'];
 
-/* criar hábito */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nome'])) {
+if (isset($_GET['excluir'])) {
+
+    excluirHabito(
+        $_GET['excluir'],
+        $usuario_id
+    );
+
+    header("Location: habitos.php");
+    exit();
+}
+
+$habitoEditando = null;
+
+if (isset($_GET['editar'])) {
+
+    $idEditar = (int) $_GET['editar'];
+
+    $resultado = listarHabitos($usuario_id);
+
+    while ($h = $resultado->fetch_assoc()) {
+
+        if ($h['id'] == $idEditar) {
+            $habitoEditando = $h;
+            break;
+        }
+    }
+}
+
+/* SALVAR EDIÇÃO */
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+    && isset($_POST['editar_habito'])
+) {
+
+    editarHabito(
+        $_POST['id'],
+        $usuario_id,
+        $_POST['nome'],
+        $_POST['frequencia']
+    );
+
+    header("Location: habitos.php");
+    exit();
+}
+
+/* CRIAR HÁBITO */
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+    && isset($_POST['nome'])
+    && !isset($_POST['editar_habito'])
+) {
 
     $nome = trim($_POST['nome']);
     $frequencia = $_POST['frequencia'];
@@ -18,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nome'])) {
     exit();
 }
 
-/* marcar hábito */
+/* MARCAR HÁBITO */
 if (isset($_GET['concluir'])) {
 
     registrarHabitoHoje($_GET['concluir']);
@@ -94,7 +143,57 @@ if ($totalHabitos > 0) {
                 </button>
 
             </form>
+                            <?php if($habitoEditando): ?>
 
+                <form method="POST" class="task-form">
+
+                    <input
+                        type="hidden"
+                        name="id"
+                        value="<?php echo $habitoEditando['id']; ?>"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="editar_habito"
+                        value="1"
+                    >
+
+                    <input
+                        type="text"
+                        name="nome"
+                        value="<?php echo htmlspecialchars($habitoEditando['nome']); ?>"
+                        required
+                    >
+
+                    <select name="frequencia">
+
+                        <option
+                            value="diario"
+                            <?php echo $habitoEditando['frequencia'] == 'diario' ? 'selected' : ''; ?>
+                        >
+                            Diário
+                        </option>
+
+                        <option
+                            value="semanal"
+                            <?php echo $habitoEditando['frequencia'] == 'semanal' ? 'selected' : ''; ?>
+                        >
+                            Semanal
+                        </option>
+
+                    </select>
+
+                    <button type="submit">
+                        <i class="fa-solid fa-pen"></i>
+                        Salvar Alterações
+                    </button>
+
+                </form>
+
+<hr>
+
+<?php endif; ?>
             <hr>
 
             <?php while($habito = $habitos->fetch_assoc()): ?>
@@ -102,60 +201,81 @@ if ($totalHabitos > 0) {
                 <?php
                 $feitoHoje = habitoConcluidoHoje($habito['id']);
                 ?>
+                <div class="task-meta">
 
-                <div class="task-card">
+    <span class="priority-baixa">
 
-                    <?php if(!$feitoHoje): ?>
+        <?php echo ucfirst($habito['frequencia']); ?>
 
-                        <form method="GET">
+    </span>
 
-                            <input
-                                type="hidden"
-                                name="concluir"
-                                value="<?php echo $habito['id']; ?>"
-                            >
+</div>
+<div class="task-card">
 
-                            <input
-                                type="checkbox"
-                                onchange="this.form.submit()"
-                            >
+    <?php if(!$feitoHoje): ?>
 
-                        </form>
+        <form method="GET">
 
-                    <?php else: ?>
+            <input
+                type="hidden"
+                name="concluir"
+                value="<?php echo $habito['id']; ?>"
+            >
 
-                        <input
-                            type="checkbox"
-                            checked
-                            disabled
-                        >
+            <input
+                type="checkbox"
+                onchange="this.form.submit()"
+            >
 
-                    <?php endif; ?>
+        </form>
 
-                    <div>
+    <?php else: ?>
 
-                        <strong>
-                            <?php echo htmlspecialchars($habito['nome']); ?>
-                        </strong>
+        <input
+            type="checkbox"
+            checked
+            disabled
+        >
 
-                        <div class="task-meta">
+    <?php endif; ?>
 
-                            <span class="priority-baixa">
+    <div class="task-content">
 
-                                <?php echo ucfirst($habito['frequencia']); ?>
+        <strong>
+            <?php echo htmlspecialchars($habito['nome']); ?>
+        </strong>
 
-                            </span>
+        <div class="task-meta">
 
-                        </div>
-
-                    </div>
-
-                </div>
-
-            <?php endwhile; ?>
+            <span class="priority-baixa">
+                <?php echo ucfirst($habito['frequencia']); ?>
+            </span>
 
         </div>
 
+    </div>
+
+    <div class="task-actions">
+
+        <a
+            href="habitos.php?editar=<?php echo $habito['id']; ?>"
+            class="edit-btn"
+        >
+            <i class="fa-solid fa-pen"></i>
+        </a>
+
+        <a
+            href="habitos.php?excluir=<?php echo $habito['id']; ?>"
+            class="delete-btn"
+            onclick="return confirm('Deseja excluir este hábito?')"
+        >
+            <i class="fa-solid fa-trash"></i>
+        </a>
+
+    </div>
+
+</div>
+        <?php endwhile; ?>
         <div class="section-card mt-4">
 
             <h3>Progresso de Hoje</h3>

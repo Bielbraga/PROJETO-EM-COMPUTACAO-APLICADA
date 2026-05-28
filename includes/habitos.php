@@ -123,4 +123,42 @@ function contarHabitosConcluidosHoje($usuario_id)
 
     return $dados['total'];
 }
+function editarHabito($id, $usuario_id, $nome, $frequencia)
+{
+    global $conn;
+
+    $sql = "UPDATE habitos
+            SET nome = ?, frequencia = ?
+            WHERE id = ? AND usuario_id = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bind_param(
+        "ssii",
+        $nome,
+        $frequencia,
+        $id,
+        $usuario_id
+    );
+
+    return $stmt->execute();
+}
+
+function excluirHabito($id, $usuario_id)
+{
+    global $conn;
+
+    $sql = "DELETE FROM habitos
+            WHERE id = ? AND usuario_id = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bind_param(
+        "ii",
+        $id,
+        $usuario_id
+    );
+
+    return $stmt->execute();
+}
 ?>

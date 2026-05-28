@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 21/05/2026 às 01:48
+-- Tempo de geração: 29/05/2026 às 01:31
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -24,6 +24,33 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `habitos`
+--
+
+CREATE TABLE `habitos` (
+  `id` int(11) NOT NULL,
+  `usuario_id` int(11) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `frequencia` enum('diario','semanal') DEFAULT 'diario',
+  `data_criacao` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `habitos_registro`
+--
+
+CREATE TABLE `habitos_registro` (
+  `id` int(11) NOT NULL,
+  `habito_id` int(11) NOT NULL,
+  `data_registro` date NOT NULL,
+  `concluido` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `tarefas`
 --
 
@@ -38,13 +65,6 @@ CREATE TABLE `tarefas` (
   `prazo` date DEFAULT NULL,
   `urgencia` enum('baixa','media','alta') DEFAULT 'media'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `tarefas`
---
-
-INSERT INTO `tarefas` (`id`, `usuario_id`, `titulo`, `descricao`, `categoria`, `status`, `data_criacao`, `prazo`, `urgencia`) VALUES
-(2, 1, 'estudar banco de dados', NULL, NULL, 'pendente', '2026-05-13 23:12:29', NULL, 'media');
 
 -- --------------------------------------------------------
 
@@ -71,6 +91,20 @@ INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`) VALUES
 --
 
 --
+-- Índices de tabela `habitos`
+--
+ALTER TABLE `habitos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario_id` (`usuario_id`);
+
+--
+-- Índices de tabela `habitos_registro`
+--
+ALTER TABLE `habitos_registro`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `habito_id` (`habito_id`);
+
+--
 -- Índices de tabela `tarefas`
 --
 ALTER TABLE `tarefas`
@@ -89,10 +123,22 @@ ALTER TABLE `usuarios`
 --
 
 --
+-- AUTO_INCREMENT de tabela `habitos`
+--
+ALTER TABLE `habitos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de tabela `habitos_registro`
+--
+ALTER TABLE `habitos_registro`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT de tabela `tarefas`
 --
 ALTER TABLE `tarefas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
@@ -103,6 +149,18 @@ ALTER TABLE `usuarios`
 --
 -- Restrições para tabelas despejadas
 --
+
+--
+-- Restrições para tabelas `habitos`
+--
+ALTER TABLE `habitos`
+  ADD CONSTRAINT `habitos_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `habitos_registro`
+--
+ALTER TABLE `habitos_registro`
+  ADD CONSTRAINT `habitos_registro_ibfk_1` FOREIGN KEY (`habito_id`) REFERENCES `habitos` (`id`) ON DELETE CASCADE;
 
 --
 -- Restrições para tabelas `tarefas`
