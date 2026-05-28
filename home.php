@@ -6,10 +6,20 @@ $usuario_id = $_SESSION['id'];
 
 /* adicionar tarefa */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['titulo'])) {
+
     $titulo = trim($_POST['titulo']);
+    $prazo = $_POST['prazo'] ?? null;
+    $urgencia = $_POST['urgencia'] ?? 'media';
 
     if (!empty($titulo)) {
-        criarTarefa($usuario_id, $titulo);
+        criarTarefa(
+            $usuario_id,
+            $titulo,
+            null,
+            null,
+            $prazo,
+            $urgencia
+        );
     }
 
     header("Location: home.php");
@@ -74,18 +84,41 @@ $totalConcluidas = contarConcluidas($usuario_id);
 
                         <?php while ($tarefa = $tarefas->fetch_assoc()): ?>
 
-                            <div class="task-card">
+                                <div class="task-card">
 
-                                <a href="home.php?concluir=<?php echo $tarefa['id']; ?>">
-                                    <input type="checkbox">
-                                </a>
+                                    <form method="GET" style="margin: 0;">
+                                        <input
+                                            type="hidden"
+                                            name="concluir"
+                                            value="<?php echo $tarefa['id']; ?>"
+                                        >
 
-                                <div>
+                                        <input
+                                            type="checkbox"
+                                            onchange="this.form.submit()"
+                                        >
+                                    </form>
+
+                                    <div>
                                     <strong><?php echo htmlspecialchars($tarefa['titulo']); ?></strong>
 
-                                    <?php if (!empty($tarefa['descricao'])): ?>
-                                        <p><?php echo htmlspecialchars($tarefa['descricao']); ?></p>
-                                    <?php endif; ?>
+                                    <div class="task-meta">
+
+                                        <?php if (!empty($tarefa['prazo'])): ?>
+                                            <span class="task-deadline">
+                                                📅 <?php echo date('d/m/Y', strtotime($tarefa['prazo'])); ?>
+                                            </span>
+                                        <?php endif; ?>
+
+                                        <span class="priority-badge priority-<?php echo $tarefa['urgencia']; ?>">
+                                            <?php
+                                                if ($tarefa['urgencia'] === 'alta') echo '🔴 Alta';
+                                                elseif ($tarefa['urgencia'] === 'media') echo '🟡 Média';
+                                                else echo '🟢 Baixa';
+                                            ?>
+                                        </span>
+
+                                    </div>
                                 </div>
 
                             </div>
@@ -99,19 +132,32 @@ $totalConcluidas = contarConcluidas($usuario_id);
                     <?php endif; ?>
                 </div>
 
-                <form method="POST" class="add-task-box">
+                <form method="POST" class="task-form">
+
                     <input
                         type="text"
                         name="titulo"
-                        placeholder="Adicionar nova tarefa..."
+                        placeholder="Título da tarefa"
                         required
                     >
 
+                    <input
+                        type="date"
+                        name="prazo"
+                    >
+
+                    <select name="urgencia">
+                        <option value="baixa">🟢 Baixa</option>
+                        <option value="media" selected>🟡 Média</option>
+                        <option value="alta">🔴 Alta</option>
+                    </select>
+
                     <button type="submit">
                         <i class="fa-solid fa-plus"></i>
+                        Adicionar
                     </button>
-                </form>
 
+                </form>
             </div>
 
             <div class="dashboard-right">

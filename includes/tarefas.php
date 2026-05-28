@@ -1,15 +1,31 @@
 <?php
 include("conexao.php");
 
-function criarTarefa($usuario_id, $titulo, $descricao = null, $categoria = null)
+function criarTarefa($usuario_id, $titulo, $descricao = null, $categoria = null, $prazo = null, $urgencia = 'media')
 {
     global $conn;
 
-    $sql = "INSERT INTO tarefas (usuario_id, titulo, descricao, categoria)
-            VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO tarefas (
+                usuario_id,
+                titulo,
+                descricao,
+                categoria,
+                prazo,
+                urgencia
+            )
+            VALUES (?, ?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("isss", $usuario_id, $titulo, $descricao, $categoria);
+
+    $stmt->bind_param(
+        "isssss",
+        $usuario_id,
+        $titulo,
+        $descricao,
+        $categoria,
+        $prazo,
+        $urgencia
+    );
 
     return $stmt->execute();
 }
@@ -52,7 +68,8 @@ function contarTarefas($usuario_id)
 
     $sql = "SELECT COUNT(*) as total
             FROM tarefas
-            WHERE usuario_id = ?";
+            WHERE usuario_id = ?
+            AND status = 'pendente'";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $usuario_id);
