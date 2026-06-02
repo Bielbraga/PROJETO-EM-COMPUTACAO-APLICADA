@@ -128,4 +128,51 @@ function excluirTarefa($tarefa_id, $usuario_id)
 
     return $stmt->execute();
 }
+function marcarImportante($tarefa_id, $usuario_id)
+{
+    global $conn;
+
+    $sql = "UPDATE tarefas
+            SET importante = 1
+            WHERE id = ?
+            AND usuario_id = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $tarefa_id, $usuario_id);
+
+    return $stmt->execute();
+}
+
+function removerImportante($tarefa_id, $usuario_id)
+{
+    global $conn;
+
+    $sql = "UPDATE tarefas
+            SET importante = 0
+            WHERE id = ?
+            AND usuario_id = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $tarefa_id, $usuario_id);
+
+    return $stmt->execute();
+}
+
+function listarImportantes($usuario_id)
+{
+    global $conn;
+
+    $sql = "SELECT *
+            FROM tarefas
+            WHERE usuario_id = ?
+            AND importante = 1
+            AND status = 'pendente'
+            ORDER BY prazo ASC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $usuario_id);
+    $stmt->execute();
+
+    return $stmt->get_result();
+}
 ?>
