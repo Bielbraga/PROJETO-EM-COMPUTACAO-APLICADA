@@ -33,9 +33,14 @@ $paginaAtual = basename($_SERVER['PHP_SELF']);
             <span>Concluídas</span>
         </a>
 
-        <a href="pessoal.php" class="menu-item <?= ($paginaAtual == 'pessoal.php') ? 'active' : '' ?>">
-            <i class="fa-solid fa-user"></i>
-            <span>Pessoal</span>
+        <a href="habitos.php" class="menu-item <?= ($paginaAtual == 'habitos.php') ? 'active' : '' ?>">
+            <i class="fa-solid fa-repeat"></i>
+            <span>Hábitos</span>
+        </a>
+
+        <a href="estatisticas.php" class="menu-item <?= ($paginaAtual == 'estatisticas.php') ? 'active' : '' ?>">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Estatísticas</span>
         </a>
 
         <a href="faculdade.php" class="menu-item <?= ($paginaAtual == 'faculdade.php') ? 'active' : '' ?>">
