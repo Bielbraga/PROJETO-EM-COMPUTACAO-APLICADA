@@ -175,4 +175,18 @@ function listarImportantes($usuario_id)
 
     return $stmt->get_result();
 }
+function restaurarTarefa($tarefa_id, $usuario_id)
+{
+    global $conn;
+
+    $sql = "UPDATE tarefas
+            SET status = 'pendente'
+            WHERE id = ?
+            AND usuario_id = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $tarefa_id, $usuario_id);
+
+    return $stmt->execute();
+}
 ?>

@@ -28,7 +28,7 @@ $paginaAtual = basename($_SERVER['PHP_SELF']);
             <span>Importante</span>
         </a>
 
-        <a href="concluidas.php" class="menu-item <?= ($paginaAtual == 'concluidas.php') ? 'active' : '' ?>">
+        <a href="concluido.php" class="menu-item <?= ($paginaAtual == 'concluido.php') ? 'active' : '' ?>">
             <i class="fa-solid fa-circle-check"></i>
             <span>Concluídas</span>
         </a>

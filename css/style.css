@@ -507,3 +507,18 @@ body.login-page {
     background: #dcfce7;
     color: #166534;
 }
+.task-content {
+    flex: 1;
+}
+
+.task-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.task-actions a {
+    text-decoration: none;
+    font-size: 22px;
+}
