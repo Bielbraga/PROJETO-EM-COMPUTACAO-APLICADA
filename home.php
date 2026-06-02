@@ -33,7 +33,27 @@ if (isset($_GET['concluir'])) {
     header("Location: home.php");
     exit();
 }
+if (isset($_GET['favoritar'])) {
 
+    marcarImportante(
+        $_GET['favoritar'],
+        $usuario_id
+    );
+
+    header("Location: home.php");
+    exit();
+}
+
+if (isset($_GET['desfavoritar'])) {
+
+    removerImportante(
+        $_GET['desfavoritar'],
+        $usuario_id
+    );
+
+    header("Location: home.php");
+    exit();
+}
 $tarefas = listarTarefas($usuario_id);
 $totalTarefas = contarTarefas($usuario_id);
 $totalConcluidas = contarConcluidas($usuario_id);
@@ -82,55 +102,86 @@ $totalConcluidas = contarConcluidas($usuario_id);
 
                     <?php if ($tarefas->num_rows > 0): ?>
 
-                        <?php while ($tarefa = $tarefas->fetch_assoc()): ?>
+<?php while ($tarefa = $tarefas->fetch_assoc()): ?>
 
-                                <div class="task-card">
+    <div class="task-card">
 
-                                    <form method="GET" style="margin: 0;">
-                                        <input
-                                            type="hidden"
-                                            name="concluir"
-                                            value="<?php echo $tarefa['id']; ?>"
-                                        >
+        <form method="GET" style="margin: 0;">
+            <input
+                type="hidden"
+                name="concluir"
+                value="<?php echo $tarefa['id']; ?>"
+            >
 
-                                        <input
-                                            type="checkbox"
-                                            onchange="this.form.submit()"
-                                        >
-                                    </form>
+            <input
+                type="checkbox"
+                onchange="this.form.submit()"
+            >
+        </form>
 
-                                    <div>
-                                    <strong><?php echo htmlspecialchars($tarefa['titulo']); ?></strong>
+        <div class="task-content">
 
-                                    <div class="task-meta">
+            <strong>
+                <?php echo htmlspecialchars($tarefa['titulo']); ?>
+            </strong>
 
-                                        <?php if (!empty($tarefa['prazo'])): ?>
-                                            <span class="task-deadline">
-                                                📅 <?php echo date('d/m/Y', strtotime($tarefa['prazo'])); ?>
-                                            </span>
-                                        <?php endif; ?>
+            <div class="task-meta">
 
-                                        <span class="priority-badge priority-<?php echo $tarefa['urgencia']; ?>">
-                                            <?php
-                                                if ($tarefa['urgencia'] === 'alta') echo '🔴 Alta';
-                                                elseif ($tarefa['urgencia'] === 'media') echo '🟡 Média';
-                                                else echo '🟢 Baixa';
-                                            ?>
-                                        </span>
+                <?php if (!empty($tarefa['prazo'])): ?>
+                    <span class="task-deadline">
+                        📅 <?php echo date('d/m/Y', strtotime($tarefa['prazo'])); ?>
+                    </span>
+                <?php endif; ?>
 
-                                    </div>
-                                </div>
+                <span class="priority-badge priority-<?php echo $tarefa['urgencia']; ?>">
+                    <?php
+                        if ($tarefa['urgencia'] === 'alta') {
+                            echo '🔴 Alta';
+                        } elseif ($tarefa['urgencia'] === 'media') {
+                            echo '🟡 Média';
+                        } else {
+                            echo '🟢 Baixa';
+                        }
+                    ?>
+                </span>
 
-                            </div>
+            </div>
 
-                        <?php endwhile; ?>
+        </div>
 
-                    <?php else: ?>
+        <div class="task-actions">
 
-                        <p>Nenhuma tarefa cadastrada.</p>
+            <?php if ($tarefa['importante']): ?>
 
-                    <?php endif; ?>
-                </div>
+                <a
+                    href="home.php?desfavoritar=<?php echo $tarefa['id']; ?>"
+                    class="edit-btn"
+                >
+                    ⭐
+                </a>
+
+            <?php else: ?>
+
+                <a
+                    href="home.php?favoritar=<?php echo $tarefa['id']; ?>"
+                    class="edit-btn"
+                >
+                    ☆
+                </a>
+
+            <?php endif; ?>
+
+        </div>
+
+    </div>
+
+<?php endwhile; ?>
+<?php else: ?>
+
+    <p>Nenhuma tarefa cadastrada.</p>
+
+<?php endif; ?>
+</div>
 
                 <form method="POST" class="task-form">
 
