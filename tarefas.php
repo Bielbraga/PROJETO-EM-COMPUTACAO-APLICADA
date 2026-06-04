@@ -62,26 +62,85 @@ $tarefasConcluidas = listarConcluidas($usuario_id);
 
                         <?php while ($tarefa = $tarefasPendentes->fetch_assoc()): ?>
 
-                            <div class="task-card">
+<div class="task-card">
 
-                                <a href="tarefas.php?concluir=<?php echo $tarefa['id']; ?>">
-                                    <input type="checkbox">
-                                </a>
+    <form method="GET" style="margin:0;">
 
-                                <div class="task-content">
-                                    <strong><?php echo htmlspecialchars($tarefa['titulo']); ?></strong>
+        <input
+            type="hidden"
+            name="concluir"
+            value="<?php echo $tarefa['id']; ?>"
+        >
 
-                                    <?php if (!empty($tarefa['descricao'])): ?>
-                                        <p><?php echo htmlspecialchars($tarefa['descricao']); ?></p>
-                                    <?php endif; ?>
-                                </div>
+        <input
+            type="checkbox"
+            onchange="this.form.submit()"
+        >
 
-                                <a href="tarefas.php?excluir=<?php echo $tarefa['id']; ?>" class="delete-btn">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
+    </form>
 
-                            </div>
+    <div class="task-content">
 
+        <strong>
+            <?php echo htmlspecialchars($tarefa['titulo']); ?>
+        </strong>
+
+        <div class="task-meta">
+
+            <?php if (!empty($tarefa['prazo'])): ?>
+
+                <span class="task-deadline">
+                    📅 <?php echo date('d/m/Y', strtotime($tarefa['prazo'])); ?>
+                </span>
+
+            <?php endif; ?>
+
+            <span class="priority-badge priority-<?php echo $tarefa['urgencia']; ?>">
+
+                <?php
+                if ($tarefa['urgencia'] === 'alta') {
+                    echo '🔴 Alta';
+                } elseif ($tarefa['urgencia'] === 'media') {
+                    echo '🟡 Média';
+                } else {
+                    echo '🟢 Baixa';
+                }
+                ?>
+
+            </span>
+
+        </div>
+
+        <?php if (!empty($tarefa['descricao'])): ?>
+
+            <p>
+                <?php echo htmlspecialchars($tarefa['descricao']); ?>
+            </p>
+
+        <?php endif; ?>
+
+        <div class="task-actions">
+
+            <a
+                href="home.php?editar=<?php echo $tarefa['id']; ?>"
+                class="edit-btn"
+            >
+                ✏️
+            </a>
+
+            <a
+                href="tarefas.php?excluir=<?php echo $tarefa['id']; ?>"
+                class="delete-btn"
+                onclick="return confirm('Excluir tarefa?')"
+            >
+                🗑️
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
                         <?php endwhile; ?>
 
                     <?php else: ?>

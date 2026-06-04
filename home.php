@@ -33,6 +33,16 @@ if (isset($_GET['concluir'])) {
     header("Location: home.php");
     exit();
 }
+if (isset($_GET['excluir'])) {
+
+    excluirTarefa(
+        $_GET['excluir'],
+        $usuario_id
+    );
+
+    header("Location: home.php");
+    exit();
+}
 if (isset($_GET['favoritar'])) {
 
     marcarImportante(
@@ -54,7 +64,54 @@ if (isset($_GET['desfavoritar'])) {
     header("Location: home.php");
     exit();
 }
-$tarefas = listarTarefas($usuario_id);
+$editar = null;
+
+if (isset($_GET['editar'])) {
+
+    $editar = buscarTarefa(
+        $_GET['editar'],
+        $usuario_id
+    );
+}
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+    && isset($_POST['editar_tarefa'])
+)
+{
+    editarTarefa(
+        $_POST['id'],
+        $usuario_id,
+        $_POST['titulo'],
+        $_POST['prazo'],
+        $_POST['urgencia']
+    );
+
+    header("Location: home.php");
+    exit();
+}
+$busca = $_GET['busca'] ?? '';
+$filtro = $_GET['filtro'] ?? '';
+if (!empty($busca)) {
+
+    $tarefas = pesquisarTarefas(
+        $usuario_id,
+        $busca
+    );
+
+}
+elseif (!empty($filtro)) {
+
+    $tarefas = listarTarefasFiltradas(
+        $usuario_id,
+        $filtro
+    );
+
+}
+else {
+
+    $tarefas = listarTarefas($usuario_id);
+
+}
 $totalTarefas = contarTarefas($usuario_id);
 $totalConcluidas = contarConcluidas($usuario_id);
 ?>
@@ -97,15 +154,82 @@ $totalConcluidas = contarConcluidas($usuario_id);
                     </div>
                 </div>
 
-                <div class="task-section">
-                    <h3>Tarefas de Hoje</h3>
+<div class="task-section">
 
-                    <?php if ($tarefas->num_rows > 0): ?>
+    <div class="task-filters">
+
+        <a href="home.php">
+            Todas
+        </a>
+
+        <a href="home.php?filtro=alta">
+            🔴 Alta
+        </a>
+
+        <a href="home.php?filtro=media">
+            🟡 Média
+        </a>
+
+        <a href="home.php?filtro=baixa">
+            🟢 Baixa
+        </a>
+
+    </div>
+
+    <h2>Tarefas de Hoje</h2>
+
+    <?php if ($tarefas->num_rows > 0): ?>
 
 <?php while ($tarefa = $tarefas->fetch_assoc()): ?>
 
     <div class="task-card">
+            <?php if ($editar): ?>
 
+<div class="section-card">
+
+    <h3>Editar Tarefa</h3>
+
+    <form method="POST" class="task-form">
+
+        <input
+            type="hidden"
+            name="id"
+            value="<?php echo $editar['id']; ?>"
+        >
+
+        <input
+            type="text"
+            name="titulo"
+            value="<?php echo htmlspecialchars($editar['titulo']); ?>"
+            required
+        >
+
+        <input
+            type="date"
+            name="prazo"
+            value="<?php echo $editar['prazo']; ?>"
+        >
+
+        <select name="urgencia">
+
+            <option value="baixa">Baixa</option>
+            <option value="media">Média</option>
+            <option value="alta">Alta</option>
+
+        </select>
+
+        <button
+            type="submit"
+            name="editar_tarefa"
+        >
+            Salvar
+        </button>
+
+    </form>
+
+</div>
+
+<?php endif; ?>
         <form method="GET" style="margin: 0;">
             <input
                 type="hidden"
@@ -146,7 +270,24 @@ $totalConcluidas = contarConcluidas($usuario_id);
                 </span>
 
             </div>
+            <div class="task-actions">
 
+    <a
+        href="home.php?editar=<?php echo $tarefa['id']; ?>"
+        class="edit-btn"
+    >
+        ✏️
+    </a>
+
+    <a
+        href="home.php?excluir=<?php echo $tarefa['id']; ?>"
+        class="delete-btn"
+        onclick="return confirm('Excluir tarefa?')"
+    >
+        🗑️
+    </a>
+
+</div>
         </div>
 
         <div class="task-actions">
@@ -238,19 +379,79 @@ $totalConcluidas = contarConcluidas($usuario_id);
                     </div>
                 </div>
 
-                <div class="info-card">
-                    <h4>Calendário</h4>
+<div class="info-card">
 
-                    <div class="calendar-fake">
-                        <span>Seg</span>
-                        <span>Ter</span>
-                        <span>Qua</span>
-                        <span>Qui</span>
-                        <span>Sex</span>
-                        <span>Sáb</span>
-                        <span>Dom</span>
-                    </div>
-                </div>
+    <h4>Calendário</h4>
+
+    <?php
+    $prazos = listarPrazosTarefas($usuario_id);
+
+$diasComPrazo = [];
+
+while ($prazo = $prazos->fetch_assoc()) {
+
+    $dia = date(
+        'j',
+        strtotime($prazo['prazo'])
+    );
+
+    $diasComPrazo[] = $dia;
+}
+
+    $mesAtual = date('m');
+    $anoAtual = date('Y');
+
+    $primeiroDia = mktime(
+        0,
+        0,
+        0,
+        $mesAtual,
+        1,
+        $anoAtual
+    );
+
+    $diasNoMes = date('t', $primeiroDia);
+
+    $diaSemana = date('N', $primeiroDia);
+
+    ?>
+
+    <div class="calendar-grid">
+
+        <div>Seg</div>
+        <div>Ter</div>
+        <div>Qua</div>
+        <div>Qui</div>
+        <div>Sex</div>
+        <div>Sáb</div>
+        <div>Dom</div>
+
+        <?php
+
+        for ($i = 1; $i < $diaSemana; $i++) {
+            echo "<div></div>";
+        }
+
+for ($dia = 1; $dia <= $diasNoMes; $dia++) {
+
+    $classe = '';
+
+    if ($dia == date('d')) {
+        $classe = 'calendar-today';
+    }
+
+    if (in_array($dia, $diasComPrazo)) {
+        $classe .= ' calendar-task';
+    }
+
+    echo "<div class='$classe'>$dia</div>";
+}
+
+        ?>
+
+    </div>
+
+</div>
 
             </div>
 

@@ -189,4 +189,119 @@ function restaurarTarefa($tarefa_id, $usuario_id)
 
     return $stmt->execute();
 }
+function buscarTarefa($id, $usuario_id)
+{
+    global $conn;
+
+    $sql = "SELECT * FROM tarefas
+            WHERE id = ?
+            AND usuario_id = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $id, $usuario_id);
+    $stmt->execute();
+
+    return $stmt->get_result()->fetch_assoc();
+}
+
+function editarTarefa(
+    $id,
+    $usuario_id,
+    $titulo,
+    $prazo,
+    $urgencia
+)
+{
+    global $conn;
+
+    $sql = "UPDATE tarefas
+            SET titulo = ?,
+                prazo = ?,
+                urgencia = ?
+            WHERE id = ?
+            AND usuario_id = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bind_param(
+        "sssii",
+        $titulo,
+        $prazo,
+        $urgencia,
+        $id,
+        $usuario_id
+    );
+
+    return $stmt->execute();
+}
+function pesquisarTarefas($usuario_id, $busca)
+{
+    global $conn;
+
+    $sql = "
+        SELECT *
+        FROM tarefas
+        WHERE usuario_id = ?
+        AND status = 'pendente'
+        AND titulo LIKE ?
+        ORDER BY data_criacao DESC
+    ";
+
+    $stmt = $conn->prepare($sql);
+
+    $texto = "%" . $busca . "%";
+
+    $stmt->bind_param(
+        "is",
+        $usuario_id,
+        $texto
+    );
+
+    $stmt->execute();
+
+    return $stmt->get_result();
+}
+function listarTarefasFiltradas($usuario_id, $urgencia)
+{
+    global $conn;
+
+    $sql = "
+        SELECT *
+        FROM tarefas
+        WHERE usuario_id = ?
+        AND status = 'pendente'
+        AND urgencia = ?
+        ORDER BY data_criacao DESC
+    ";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bind_param(
+        "is",
+        $usuario_id,
+        $urgencia
+    );
+
+    $stmt->execute();
+
+    return $stmt->get_result();
+}
+function listarPrazosTarefas($usuario_id)
+{
+    global $conn;
+
+    $sql = "
+        SELECT prazo
+        FROM tarefas
+        WHERE usuario_id = ?
+        AND prazo IS NOT NULL
+        AND status = 'pendente'
+    ";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $usuario_id);
+    $stmt->execute();
+
+    return $stmt->get_result();
+}
 ?>

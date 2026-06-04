@@ -37,6 +37,7 @@ if ($totalTarefas > 0) {
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <link rel="stylesheet" href="./css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -88,10 +89,48 @@ if ($totalTarefas > 0) {
             </div>
 
         </div>
+        <div class="info-card chart-card">
+            <h4>📊 Distribuição de Produtividade</h4>
+
+            <canvas id="productivityChart"></canvas>
+        </div>
 
     </div>
 
 </div>
+<script>
+const ctx = document.getElementById('productivityChart');
 
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            'Tarefas',
+            'Concluídas',
+            'Importantes',
+            'Hábitos',
+            'Faculdade'
+        ],
+        datasets: [{
+            data: [
+                <?php echo $totalTarefas; ?>,
+                <?php echo $totalConcluidas; ?>,
+                <?php echo $totalImportantes; ?>,
+                <?php echo $totalHabitos; ?>,
+                <?php echo $totalFaculdade; ?>
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
 </body>
 </html>
