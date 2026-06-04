@@ -52,54 +52,63 @@ $tarefas = listarConcluidas($usuario_id);
 
                 <?php while ($tarefa = $tarefas->fetch_assoc()): ?>
 
-                    <div class="task-card completed">
+<div class="task-card completed">
 
-                        <div class="task-content">
+    <div class="task-content">
 
-                            <strong>
-                                <?php echo htmlspecialchars($tarefa['titulo']); ?>
-                            </strong>
+        <strong>
+            <?php echo htmlspecialchars($tarefa['titulo']); ?>
+        </strong>
 
-                            <div class="task-meta">
+        <div class="task-meta">
 
-                                <?php if (!empty($tarefa['prazo'])): ?>
-                                    <span class="task-deadline">
-                                        📅 <?php echo date('d/m/Y', strtotime($tarefa['prazo'])); ?>
-                                    </span>
-                                <?php endif; ?>
+            <?php if (!empty($tarefa['prazo'])): ?>
 
-                                <span class="priority-badge priority-<?php echo $tarefa['urgencia']; ?>">
+                <span class="task-deadline">
+                    📅 <?php echo date('d/m/Y', strtotime($tarefa['prazo'])); ?>
+                </span>
 
-                                    <?php
-                                    if ($tarefa['urgencia'] === 'alta') {
-                                        echo '🔴 Alta';
-                                    } elseif ($tarefa['urgencia'] === 'media') {
-                                        echo '🟡 Média';
-                                    } else {
-                                        echo '🟢 Baixa';
-                                    }
-                                    ?>
+            <?php endif; ?>
 
-                                </span>
+            <span class="priority-badge priority-<?php echo $tarefa['urgencia']; ?>">
 
-                            </div>
+                <?php
+                if ($tarefa['urgencia'] === 'alta') {
+                    echo '🔴 Alta';
+                } elseif ($tarefa['urgencia'] === 'media') {
+                    echo '🟡 Média';
+                } else {
+                    echo '🟢 Baixa';
+                }
+                ?>
 
-                        </div>
+            </span>
 
-                        <div class="task-actions">
+        </div>
 
-                            <a
-                                href="concluido.php?restaurar=<?php echo $tarefa['id']; ?>"
-                                class="edit-btn"
-                                title="Restaurar tarefa"
-                            >
-                                ↩️
-                            </a>
+        <?php if (!empty($tarefa['descricao'])): ?>
 
-                        </div>
+            <p>
+                <?php echo htmlspecialchars($tarefa['descricao']); ?>
+            </p>
 
-                    </div>
+        <?php endif; ?>
 
+    </div>
+
+    <div class="task-actions">
+
+        <a
+            href="concluido.php?restaurar=<?php echo $tarefa['id']; ?>"
+            class="edit-btn"
+            title="Restaurar tarefa"
+        >
+            ↩️
+        </a>
+
+    </div>
+
+</div>
                 <?php endwhile; ?>
 
             <?php else: ?>

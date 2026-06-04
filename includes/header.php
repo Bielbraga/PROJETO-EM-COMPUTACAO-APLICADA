@@ -1,9 +1,17 @@
 <div class="topbar">
 
-    <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Pesquisar tarefas...">
-    </div>
+<form method="GET" class="search-bar">
+
+    <i class="fa-solid fa-magnifying-glass"></i>
+
+    <input
+        type="text"
+        name="busca"
+        placeholder="Pesquisar tarefas..."
+        value="<?php echo htmlspecialchars($_GET['busca'] ?? ''); ?>"
+    >
+
+</form>
 
     <div class="top-actions">
 
