@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 29/05/2026 às 01:31
+-- Tempo de geração: 05/06/2026 às 00:54
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -20,6 +20,28 @@ SET time_zone = "+00:00";
 --
 -- Banco de dados: `focusflow`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `faculdade`
+--
+
+CREATE TABLE `faculdade` (
+  `id` int(11) NOT NULL,
+  `usuario_id` int(11) NOT NULL,
+  `disciplina` varchar(255) NOT NULL,
+  `atividade` varchar(255) NOT NULL,
+  `prazo` date DEFAULT NULL,
+  `status` enum('pendente','concluida') DEFAULT 'pendente'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `faculdade`
+--
+
+INSERT INTO `faculdade` (`id`, `usuario_id`, `disciplina`, `atividade`, `prazo`, `status`) VALUES
+(1, 1, 'matematica', 'execicio de calculo 1', '2026-06-18', 'concluida');
 
 -- --------------------------------------------------------
 
@@ -63,7 +85,8 @@ CREATE TABLE `tarefas` (
   `status` enum('pendente','concluida') DEFAULT 'pendente',
   `data_criacao` timestamp NOT NULL DEFAULT current_timestamp(),
   `prazo` date DEFAULT NULL,
-  `urgencia` enum('baixa','media','alta') DEFAULT 'media'
+  `urgencia` enum('baixa','media','alta') DEFAULT 'media',
+  `importante` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -89,6 +112,13 @@ INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`) VALUES
 --
 -- Índices para tabelas despejadas
 --
+
+--
+-- Índices de tabela `faculdade`
+--
+ALTER TABLE `faculdade`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario_id` (`usuario_id`);
 
 --
 -- Índices de tabela `habitos`
@@ -123,6 +153,12 @@ ALTER TABLE `usuarios`
 --
 
 --
+-- AUTO_INCREMENT de tabela `faculdade`
+--
+ALTER TABLE `faculdade`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de tabela `habitos`
 --
 ALTER TABLE `habitos`
@@ -138,7 +174,7 @@ ALTER TABLE `habitos_registro`
 -- AUTO_INCREMENT de tabela `tarefas`
 --
 ALTER TABLE `tarefas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
@@ -149,6 +185,12 @@ ALTER TABLE `usuarios`
 --
 -- Restrições para tabelas despejadas
 --
+
+--
+-- Restrições para tabelas `faculdade`
+--
+ALTER TABLE `faculdade`
+  ADD CONSTRAINT `faculdade_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Restrições para tabelas `habitos`
