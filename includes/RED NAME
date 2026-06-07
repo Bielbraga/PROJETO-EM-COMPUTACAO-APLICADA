@@ -1,0 +1,30 @@
+# Descrição
+O projeto original consiste em um *sistema web de gerenciamento de tarefas*, desenvolvido com o objetivo de ajudar usuários a organizarem suas atividades diárias de forma simples e eficiente. A aplicação permite o cadastro de usuários, autenticação segura e o gerenciamento completo de tarefas por meio de uma dashboard integrada ao banco de dados.
+
+O sistema oferece funcionalidades como criação dinâmica de tarefas, definição de prioridades e prazos, acompanhamento do progresso e conclusão de tarefas. A interface foi desenvolvida com foco em usabilidade, apresentando uma navegação lateral dinâmica e uma dashboard moderna que facilita a visualização das informações principais.
+
+---
+
+### Funcionalidades Existentes
+- Sistema de login e autenticação de usuários
+- Cadastro e gerenciamento de tarefas
+- Dashboard funcional integrada ao banco de dados
+- Criação dinâmica de tarefas
+- Sistema de conclusão de tarefas
+- Atualização automática de contadores
+- Definição de prioridades e prazos
+- Sidebar dinâmica com seções de hábitos e estatísticas
+
+---
+
+### Limitações Identificadas
+- *Ausência de notificações e lembretes:* o sistema não avisa o usuário sobre prazos próximos, o que pode levar ao esquecimento de tarefas importantes.
+- *Relatórios e estatísticas limitadas:* apesar de existir uma área de estatísticas, não há gráficos detalhados ou análises mais profundas sobre produtividade.
+- *Escalabilidade funcional restrita:* o sistema foi desenvolvido inicialmente para uso individual, sem suporte a colaboração entre usuários ou compartilhamento de tarefas.
+
+---
+
+### Tecnologias Utilizadas
+- *Frontend:* Bootstrap, CSS3, Font Awesome  
+- *Backend:* PHP  
+- *Banco de Dados:* MySQL
